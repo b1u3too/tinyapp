@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/b1u3too/tinyapp/issues"
   },
-  "homepage": "https://github.com/b1u3too/tinyapp#readme"
+  "homepage": "https://github.com/b1u3too/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
 }
