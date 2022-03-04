@@ -46,11 +46,11 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); //Log the POST request body to the Console
-  urlDatabase[generateRandomString()] = req.body.longURL; //save new shortURL/longURL pair to the database
-  console.log('urlDatabase', urlDatabase);
-  res.send("Ok");
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL; //save new shortURL/longURL pair to the database
+  res.redirect(`/urls/${shortURL}`);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, () => {express
   console.log(`Example app listening on port ${PORT}`);
 });
