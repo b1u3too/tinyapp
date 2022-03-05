@@ -57,6 +57,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+//POST Edit request to server database
+app.post("/urls/:shortURL", (req, res) => {
+  console.log(req.body); //Log the POST request body to the Console
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.longURL; //save new shortURL/longURL pair to the database
+  res.redirect("/urls");
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body); //Log the POST request body to the Console
   const shortURL = generateRandomString();
