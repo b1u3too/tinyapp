@@ -50,6 +50,13 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log("Delete request recieved", req.params);
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
+});
+
 app.post("/urls", (req, res) => {
   console.log(req.body); //Log the POST request body to the Console
   const shortURL = generateRandomString();
