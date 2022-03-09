@@ -29,6 +29,13 @@ function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
 };
 
+function isEmailAlreadyRegistered(users, newEmail) {
+  for (const userId in users) {
+    if (users[userId].email === newEmail) return true;
+  }
+  return false;
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -98,7 +105,9 @@ app.post("/register", (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password.trim();
 
-  if (!email || !password ) return res.status(418).send("ERROR: Please input at least one character in both email and password");
+  if (!email || !password ) return res.status(400).send("ERROR: Please input at least one character in both email and password");
+
+  if (isEmailAlreadyRegistered(users, email)) return res.status(400).send("ERROR: Email address not available");
 
   const id = generateRandomString();
   users[id] = { id, email, password };
