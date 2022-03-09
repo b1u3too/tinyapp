@@ -4,7 +4,6 @@ const express = require("express");
 const app = express();
 app.use(cookieParser());
 const PORT = 8080; //default port 8080
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -12,6 +11,19 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  "0078a1": {
+    id: "0078a1", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "424224": {
+    id: "424224", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
 function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
@@ -79,6 +91,17 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL; //save new shortURL/longURL pair to the database
+  res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  const id = generateRandomString();
+  console.log(req.body);
+  const email = req.body.email;
+  const password = req.body.password;
+  users[id] = { id, email, password };
+  console.log(users);
+  res.cookie("user_id", id);
   res.redirect("/urls");
 });
 
