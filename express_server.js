@@ -50,7 +50,6 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  console.log(req.cookies.user_id);
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies.user_id]
@@ -96,12 +95,14 @@ app.post("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
+
+  if (!email || !password ) return res.status(418).send("ERROR: Please input at least one character in both email and password");
+
   const id = generateRandomString();
-  console.log(req.body);
-  const email = req.body.email;
-  const password = req.body.password;
   users[id] = { id, email, password };
-  console.log(users);
+
   res.cookie("user_id", id);
   res.redirect("/urls");
 });
