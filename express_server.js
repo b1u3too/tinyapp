@@ -11,7 +11,7 @@ app.set("view engine", "ejs");
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
+    userID: "424224"
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
@@ -43,7 +43,7 @@ const findUserByEmail = function(users, newEmail) {
   return false;
 };
 
-const getUrlsBelongingToUser = function(urlDatabase, userId) {
+const urlsForUser = function(urlDatabase, userId) {
   const result = {};
 
   for (const key in urlDatabase) {
@@ -69,7 +69,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: getUrlsBelongingToUser(urlDatabase, req.cookies.user_id),
+    urls: urlsForUser(urlDatabase, req.cookies.user_id),
     user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
