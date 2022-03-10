@@ -94,6 +94,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //redirect user to shortURL address requested
 app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.param.shortURL]) return res.status(404).send("Invalid short link ID!");
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
