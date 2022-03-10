@@ -125,7 +125,6 @@ app.post("/register", (req, res) => {
 
 //POST log in existing user
 app.post("/login", (req, res) => {
-  console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
   const id = findUserByEmail(users, email);
