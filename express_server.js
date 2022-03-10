@@ -124,6 +124,9 @@ app.get("/login", (req, res) => {
 
 //POST delete request to the database
 app.post("/urls/:shortURL/delete", (req, res) => {
+  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+    return res.status(401).send("You are not authorized to delete this link");
+  }
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect("/urls");
@@ -131,6 +134,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //POST Edit request to server database
 app.post("/urls/:shortURL", (req, res) => {
+  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+    return res.status(401).send("You are not authorized to edit this link");
+  }
+
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
