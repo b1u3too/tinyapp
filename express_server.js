@@ -65,6 +65,9 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.user_id) {
+    return res.redirect("/login");
+  }
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies.user_id]
