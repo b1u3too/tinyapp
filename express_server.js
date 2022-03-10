@@ -29,9 +29,9 @@ function generateRandomString() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-function isEmailAlreadyRegistered(users, newEmail) {
+function findUserByEmail(users, newEmail) {
   for (const userId in users) {
-    if (users[userId].email === newEmail) return true;
+    if (users[userId].email === newEmail) return userId;
   }
   return false;
 }
@@ -114,7 +114,7 @@ app.post("/register", (req, res) => {
 
   if (!email || !password ) return res.status(400).send("ERROR: Please input at least one character in both email and password");
 
-  if (isEmailAlreadyRegistered(users, email)) return res.status(400).send("ERROR: Email address not available");
+  if (findUserByEmail(users, email)) return res.status(400).send("ERROR: Email address not available");
 
   const id = generateRandomString();
   users[id] = { id, email, password };
@@ -125,9 +125,11 @@ app.post("/register", (req, res) => {
 
 //POST log in existing user
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie("username", username);
-  res.redirect("/urls");
+  // const email = req.body.email;
+  // const password = req.body.password;
+//REFACTOR PENDING
+
+  // res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
