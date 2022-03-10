@@ -68,6 +68,9 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  if (!req.cookies.user_id) {
+    res.redirect("/notAuthorized");
+  }
   const templateVars = {
     urls: urlsForUser(urlDatabase, req.cookies.user_id),
     user: users[req.cookies.user_id]
@@ -95,13 +98,22 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-
+  const cookieID = req.cookies.user_id;
+  if (!req.cookies.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
+    res.redirect("/notAuthorized");
+  }
   const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
+    url: urlDatabase[req.params.shortURL],
     user: users[req.cookies.user_id]
   };
   res.render("urls_show", templateVars);
+});
+
+app.get("/notAuthorized", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies.user_id]
+  }
+  res.render("urls_pleaseAuth", templateVars);
 });
 
 //redirect user to shortURL address requested
