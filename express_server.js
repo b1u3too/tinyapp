@@ -10,38 +10,38 @@ app.set("view engine", "ejs");
 
 const urlDatabase = {
   b6UTxQ: {
-        longURL: "https://www.tsn.ca",
-        userID: "aJ48lW"
-    },
-    i3BoGr: {
-        longURL: "https://www.google.ca",
-        userID: "aJ48lW"
-    }
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
+  }
 };
 
 const users = {
   "0078a1": {
-    id: "0078a1", 
-    email: "user@example.com", 
+    id: "0078a1",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "424224": {
-    id: "424224", 
-    email: "user2@example.com", 
+  "424224": {
+    id: "424224",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
-function generateRandomString() {
+const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-function findUserByEmail(users, newEmail) {
+const findUserByEmail = function(users, newEmail) {
   for (const userId in users) {
     if (users[userId].email === newEmail) return userId;
   }
   return false;
-}
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -94,7 +94,8 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //redirect user to shortURL address requested
 app.get("/u/:shortURL", (req, res) => {
-  if (!urlDatabase[req.param.shortURL]) return res.status(404).send("Invalid short link ID!");
+  if (!urlDatabase[req.params.shortURL]) return res.status(404).send("Invalid short link ID!");
+
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
@@ -105,7 +106,7 @@ app.get("/login", (req, res) => {
   }
   const templateVars = {
     user: users[req.cookies.user_id]
-  }
+  };
   res.render("urls_login", templateVars);
 });
 
@@ -128,7 +129,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password.trim();
 
-  if (!email || !password ) return res.status(400).send("ERROR: Please input at least one character in both email and password");
+  if (!email || !password) return res.status(400).send("ERROR: Please input at least one character in both email and password");
 
   if (findUserByEmail(users, email)) return res.status(400).send("ERROR: Email address not available");
 
@@ -155,7 +156,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
-})
+});
 
 app.post("/urls", (req, res) => {
   if (!req.cookies.user_id) {
@@ -167,6 +168,6 @@ app.post("/urls", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  express
+  express;
   console.log(`Example app listening on port ${PORT}`);
 });
