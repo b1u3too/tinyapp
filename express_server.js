@@ -43,6 +43,18 @@ const findUserByEmail = function(users, newEmail) {
   return false;
 };
 
+const getUrlsBelongingToUser = function(urlDatabase, userId) {
+  const result = {};
+
+  for (const key in urlDatabase) {
+    if (urlDatabase[key].userID === userId) {
+      result[key] = urlDatabase[key];
+    }
+  }
+
+  return result;
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -57,7 +69,7 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    urls: getUrlsBelongingToUser(urlDatabase, req.cookies.user_id),
     user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
