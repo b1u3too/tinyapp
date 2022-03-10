@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require("express");
+const { restart } = require('nodemon');
 const app = express();
 app.use(cookieParser());
 const PORT = 8080; //default port 8080
@@ -114,6 +115,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 });
 
+//POST register new user
 app.post("/register", (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password.trim();
@@ -148,6 +150,9 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/urls", (req, res) => {
+  if (!req.cookies.user_id) {
+    return res.status(401).send("Unauthorized action");
+  }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL; //save new shortURL/longURL pair to the database
   res.redirect(`/urls/${shortURL}`);
