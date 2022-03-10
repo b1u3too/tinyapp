@@ -125,11 +125,16 @@ app.post("/register", (req, res) => {
 
 //POST log in existing user
 app.post("/login", (req, res) => {
-  // const email = req.body.email;
-  // const password = req.body.password;
-//REFACTOR PENDING
+  console.log(req.body);
+  const email = req.body.email;
+  const password = req.body.password;
+  const id = findUserByEmail(users, email);
 
-  // res.redirect("/urls");
+  if (!id) return res.status(403).send("Invalid credentials");
+  if (password !== users[id].password) return res.status(403).send("Invalid credentials");
+
+  res.cookie("user_id", id);
+  res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
