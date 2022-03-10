@@ -99,11 +99,18 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const cookieID = req.cookies.user_id;
+  const shortURL = req.params.shortURL;
+
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("The requested page does not exist");
+  }
+
   if (!req.cookies.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
     res.redirect("/notAuthorized");
   }
   const templateVars = {
-    url: urlDatabase[req.params.shortURL],
+    shortURL: shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies.user_id]
   };
   res.render("urls_show", templateVars);
@@ -136,21 +143,30 @@ app.get("/login", (req, res) => {
 
 //POST delete request to the database
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
-    return res.status(401).send("You are not authorized to delete this link");
-  }
   const shortURL = req.params.shortURL;
+  if (!req.cookies.user_id) {
+    return res.status(401).send("You are not authorized to delete this link\n");
+  }
+
+  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+    return res.status(401).send("You are not authorized to delete this link\n");
+  }
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
 //POST Edit request to server database
 app.post("/urls/:shortURL", (req, res) => {
-  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
-    return res.status(401).send("You are not authorized to edit this link");
+  const shortURL = req.params.shortURL;
+
+  if (!req.cookies.user_id) {
+    return res.status(401).send("You are not authorized to edit this link\n");
   }
 
-  const shortURL = req.params.shortURL;
+  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+    return res.status(401).send("You are not authorized to edit this link\n");
+  }
+
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
