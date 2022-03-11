@@ -1,9 +1,12 @@
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const express = require("express");
 const { restart } = require('nodemon');
 const app = express();
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 const PORT = 8080; //default port 8080
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -72,12 +75,12 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
-    res.redirect("/notAuthorized");
+  if (!req.session.user_id) {
+    return res.redirect("/notAuthorized");
   }
   const templateVars = {
-    urls: urlsForUser(urlDatabase, req.cookies.user_id),
-    user: users[req.cookies.user_id]
+    urls: urlsForUser(urlDatabase, req.session.user_id),
+    user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
 });
@@ -85,62 +88,64 @@ app.get("/urls", (req, res) => {
 app.get("/register", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.cookies.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_register", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   }
   const templateVars = {
     urls: urlDatabase,
-    user: users[req.cookies.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-  const cookieID = req.cookies.user_id;
+  const cookieID = req.session.user_id;
   const shortURL = req.params.shortURL;
 
   if (!urlDatabase.hasOwnProperty(shortURL)) {
     return res.status(404).send("The requested page does not exist");
   }
 
-  if (!req.cookies.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
+  if (!req.session.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
     return res.redirect("/notAuthorized");
   }
   const templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/notAuthorized", (req, res) => {
   const templateVars = {
-    user: users[req.cookies.user_id]
+    user: users[req.session.user_id]
   }
   res.render("urls_pleaseAuth", templateVars);
 });
 
 //redirect user to shortURL address requested
 app.get("/u/:shortURL", (req, res) => {
-  if (!urlDatabase[req.params.shortURL]) return res.status(404).send("Invalid short link ID!");
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send("Invalid short link ID!");
+  }
 
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
 app.get("/login", (req, res) => {
-  if (req.cookies.user_id) {
+  if (req.session.user_id) {
     return res.redirect("/urls");
   }
   const templateVars = {
-    user: users[req.cookies.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_login", templateVars);
 });
@@ -148,11 +153,11 @@ app.get("/login", (req, res) => {
 //POST delete request to the database
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.status(401).send("You are not authorized to delete this link\n");
   }
 
-  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+  if (req.session.user_id !== urlDatabase[shortURL].userID) {
     return res.status(401).send("You are not authorized to delete this link\n");
   }
   delete urlDatabase[shortURL];
@@ -163,11 +168,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
 
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.status(401).send("You are not authorized to edit this link\n");
   }
 
-  if (req.cookies.user_id !== urlDatabase[shortURL].userID) {
+  if (req.session.user_id !== urlDatabase[shortURL].userID) {
     return res.status(401).send("You are not authorized to edit this link\n");
   }
 
@@ -194,7 +199,8 @@ app.post("/register", (req, res) => {
 
   console.log(users);
 
-  res.cookie("user_id", id).redirect("urls");
+  req.session.user_id = id;
+  res.redirect("urls");
 });
 
 //POST log in existing user
@@ -210,19 +216,22 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Invalid credentials");
   }
 
-  res.cookie("user_id", id).redirect("/urls");
+  req.session.user_id = id;
+  res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id").redirect("/urls");
+  req.session = null;
+  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     return res.status(401).send("Unauthorized action");
   }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
+  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
