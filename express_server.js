@@ -74,7 +74,7 @@ app.get("/register", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) {
-    return res.redirect("/login");
+    return res.redirect("/notAuthorized");
   }
   const templateVars = {
     urls: urlDatabase,
