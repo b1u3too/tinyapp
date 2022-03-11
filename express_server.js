@@ -8,6 +8,8 @@ const PORT = 8080; //default port 8080
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+const bcrypt = require('bcryptjs');
+
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -23,12 +25,12 @@ const users = {
   "0078a1": {
     id: "0078a1",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    hashPass: "$2a$10$9JhxGeZsIxrloZcBIs1TEuRKFGGViuCTixJ/YDFepLgmuSAaxJmzm"
   },
   "424224": {
     id: "424224",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    hashPass: "$2a$10$THG90bl8JVCP6QDIMhK.Yu2XDYKTM8kWwBJ0axX9jnOfinji15tmq"
   }
 };
 
@@ -181,7 +183,10 @@ app.post("/register", (req, res) => {
   if (findUserByEmail(users, email)) return res.status(400).send("ERROR: Email address not available");
 
   const id = generateRandomString();
-  users[id] = { id, email, password };
+  const hashPass = bcrypt.hashSync(password, 10);
+  users[id] = { id, email, hashPass };
+
+  console.log(users);
 
   res.cookie("user_id", id);
   res.redirect("/urls");
