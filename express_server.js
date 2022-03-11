@@ -43,7 +43,7 @@ const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-const findUserByEmail = function(users, newEmail) {
+const getUserByEmail = function(users, newEmail) {
   for (const userId in users) {
     if (users[userId].email === newEmail) return userId;
   }
@@ -189,7 +189,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("ERROR: Please input at least one character in both email and password");
   }
 
-  if (findUserByEmail(users, email)) {
+  if (getUserByEmail(users, email)) {
     return res.status(400).send("ERROR: Email address not available");
   }
 
@@ -205,7 +205,7 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const passwordIn = req.body.password;
-  const id = findUserByEmail(users, email);
+  const id = getUserByEmail(users, email);
 
   if (!id) {
     return res.status(403).send("Invalid credentials");
