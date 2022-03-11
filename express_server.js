@@ -1,17 +1,19 @@
 const bodyParser = require('body-parser');
+const { generateRandomString, getUserByEmail, urlsForUser } = require('./helpers');
 const cookieSession = require('cookie-session');
 const express = require("express");
 const { restart } = require('nodemon');
+const bcrypt = require('bcryptjs');
+
 const app = express();
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
-const PORT = 8080; //default port 8080
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
-const bcrypt = require('bcryptjs');
+const PORT = 8080; //default port 8080
 
 const urlDatabase = {
   b6UTxQ: {
@@ -38,29 +40,6 @@ const users = {
     //index testing -- originally dishwasher-funk
   }
 };
-
-const generateRandomString = function() {
-  return Math.random().toString(36).substr(2, 6);
-};
-
-const getUserByEmail = function(users, newEmail) {
-  for (const userId in users) {
-    if (users[userId].email === newEmail) return userId;
-  }
-  return false;
-};
-
-const urlsForUser = function(urlDatabase, userId) {
-  const result = {};
-
-  for (const key in urlDatabase) {
-    if (urlDatabase[key].userID === userId) {
-      result[key] = urlDatabase[key];
-    }
-  }
-
-  return result;
-}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
