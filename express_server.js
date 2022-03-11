@@ -132,6 +132,7 @@ app.get("/notAuthorized", (req, res) => {
 
 //redirect user to shortURL address requested
 app.get("/u/:shortURL", (req, res) => {
+  console.log("get params", req.params);
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("Invalid short link ID!");
   }
@@ -230,7 +231,7 @@ app.post("/urls", (req, res) => {
     return res.status(401).send("Unauthorized action");
   }
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.user_id };
   console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
