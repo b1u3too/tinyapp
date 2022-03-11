@@ -132,7 +132,6 @@ app.get("/notAuthorized", (req, res) => {
 
 //redirect user to shortURL address requested
 app.get("/u/:shortURL", (req, res) => {
-  console.log("get params", req.params);
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("Invalid short link ID!");
   }
@@ -198,8 +197,6 @@ app.post("/register", (req, res) => {
   const hashPass = bcrypt.hashSync(password, 10);
   users[id] = { id, email, hashPass };
 
-  console.log(users);
-
   req.session.user_id = id;
   res.redirect("urls");
 });
@@ -232,7 +229,6 @@ app.post("/urls", (req, res) => {
   }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.session.user_id };
-  console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
 
