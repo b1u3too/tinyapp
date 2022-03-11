@@ -26,11 +26,13 @@ const users = {
     id: "0078a1",
     email: "user@example.com",
     hashPass: "$2a$10$9JhxGeZsIxrloZcBIs1TEuRKFGGViuCTixJ/YDFepLgmuSAaxJmzm"
+    //indev testing -- originally purple-monkey-dinosaur
   },
   "424224": {
     id: "424224",
     email: "user2@example.com",
     hashPass: "$2a$10$THG90bl8JVCP6QDIMhK.Yu2XDYKTM8kWwBJ0axX9jnOfinji15tmq"
+    //index testing -- originally dishwasher-funk
   }
 };
 
@@ -108,7 +110,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
 
   if (!req.cookies.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
-    res.redirect("/notAuthorized");
+    return res.redirect("/notAuthorized");
   }
   const templateVars = {
     shortURL: shortURL,
@@ -178,9 +180,13 @@ app.post("/register", (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password.trim();
 
-  if (!email || !password) return res.status(400).send("ERROR: Please input at least one character in both email and password");
+  if (!email || !password) {
+    return res.status(400).send("ERROR: Please input at least one character in both email and password");
+  }
 
-  if (findUserByEmail(users, email)) return res.status(400).send("ERROR: Email address not available");
+  if (findUserByEmail(users, email)) {
+    return res.status(400).send("ERROR: Email address not available");
+  }
 
   const id = generateRandomString();
   const hashPass = bcrypt.hashSync(password, 10);
@@ -188,26 +194,27 @@ app.post("/register", (req, res) => {
 
   console.log(users);
 
-  res.cookie("user_id", id);
-  res.redirect("/urls");
+  res.cookie("user_id", id).redirect("urls");
 });
 
 //POST log in existing user
 app.post("/login", (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  const passwordIn = req.body.password;
   const id = findUserByEmail(users, email);
 
-  if (!id) return res.status(403).send("Invalid credentials");
-  if (password !== users[id].password) return res.status(403).send("Invalid credentials");
+  if (!id) {
+    return res.status(403).send("Invalid credentials");
+  }
+  if (bcrypt.compareSync(users[id].hashPass, passwordIn)) {
+    return res.status(403).send("Invalid credentials");
+  }
 
-  res.cookie("user_id", id);
-  res.redirect("/urls");
+  res.cookie("user_id", id).redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.clearCookie("user_id").redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
