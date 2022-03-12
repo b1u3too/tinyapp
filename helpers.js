@@ -20,10 +20,10 @@ const urlsForUser = function(userId, urlDatabase) {
   }
 
   return result;
-}
+};
 
 module.exports = {
   generateRandomString,
-  getUserByEmail, 
+  getUserByEmail,
   urlsForUser
 };

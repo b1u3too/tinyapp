@@ -85,7 +85,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const cookieID = req.session.user_id;
   const shortURL = req.params.shortURL;
 
-  if (!urlDatabase.hasOwnProperty(shortURL)) {
+  if (!Object.prototype.hasOwnProperty.call(urlDatabase, shortURL)) {
     return res.status(404).send("The requested page does not exist");
   }
 
@@ -103,7 +103,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/notAuthorized", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id]
-  }
+  };
   res.render("urls_pleaseAuth", templateVars);
 });
 
