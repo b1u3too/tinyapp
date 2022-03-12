@@ -6,13 +6,13 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-###Login Screen
+### Login Screen
 !["Login Page"](https://github.com/b1u3too/tinyapp/blob/main/docs/login.png)
 
-###Your URLS
+### Your URLS
 !["Your URLS"](https://github.com/b1u3too/tinyapp/blob/main/docs/your-urls.png)
 
-###Uh oh, those aren't your URLS!
+### Uh oh, those aren't your URLS!
 !["Uh oh, those aren't your URLS!"](https://github.com/b1u3too/tinyapp/blob/main/docs/not-authorized.png)
 
 ## Dependencies
