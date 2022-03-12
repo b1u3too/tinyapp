@@ -2,14 +2,15 @@ const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 6);
 };
 
-const getUserByEmail = function(users, newEmail) {
+const getUserByEmail = function(newEmail, users) {
   for (const userId in users) {
-    if (users[userId].email === newEmail) return userId;
+    if (users[userId].email === newEmail) {
+      return userId;
+    }
   }
-  return false;
 };
 
-const urlsForUser = function(urlDatabase, userId) {
+const urlsForUser = function(userId, urlDatabase) {
   const result = {};
 
   for (const key in urlDatabase) {
