@@ -30,14 +30,12 @@ const users = {
   "0078a1": {
     id: "0078a1",
     email: "user@example.com",
-    hashPass: "$2a$10$9JhxGeZsIxrloZcBIs1TEuRKFGGViuCTixJ/YDFepLgmuSAaxJmzm"
-    //indev testing -- originally purple-monkey-dinosaur
+    hashPass: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
   "424224": {
     id: "424224",
     email: "user2@example.com",
-    hashPass: "$2a$10$THG90bl8JVCP6QDIMhK.Yu2XDYKTM8kWwBJ0axX9jnOfinji15tmq"
-    //index testing -- originally dishwasher-funk
+    hashPass: bcrypt.hashSync("dishwasher-funk", 10)
   }
 };
 
@@ -58,7 +56,7 @@ app.get("/urls", (req, res) => {
     return res.redirect("/notAuthorized");
   }
   const templateVars = {
-    urls: urlsForUser(urlDatabase, req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
@@ -168,7 +166,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("ERROR: Please input at least one character in both email and password");
   }
 
-  if (getUserByEmail(users, email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(400).send("ERROR: Email address not available");
   }
 
@@ -184,7 +182,7 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const passwordIn = req.body.password;
-  const id = getUserByEmail(users, email);
+  const id = getUserByEmail(email, users);
 
   if (!id) {
     return res.status(403).send("Invalid credentials");
