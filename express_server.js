@@ -89,6 +89,7 @@ app.get("/urls/:shortURL", (req, res) => {
     return res.status(404).send("The requested page does not exist");
   }
 
+  //redirect to /notAuthorized if not logged in OR specified link doesn't belong to the ID in the session cookie
   if (!req.session.user_id || urlDatabase[req.params.shortURL].userID !== cookieID) {
     return res.redirect("/notAuthorized");
   }
@@ -165,10 +166,11 @@ app.post("/register", (req, res) => {
   const email = req.body.email.trim();
   const password = req.body.password.trim();
 
+  //pass back error if not at least one character in both fields
   if (!email || !password) {
     return res.status(400).send("ERROR: Please input at least one character in both email and password");
   }
-
+  //pass back error if email address already in use
   if (getUserByEmail(email, users)) {
     return res.status(400).send("ERROR: Email address not available");
   }
@@ -187,9 +189,11 @@ app.post("/login", (req, res) => {
   const passwordIn = req.body.password;
   const id = getUserByEmail(email, users);
 
+  //pass back vague error if email address doesn't belong to any users
   if (!id) {
     return res.status(403).send("Invalid credentials");
   }
+  //pass back vague error if password submitted doesn't match stored hash
   if (!bcrypt.compareSync(passwordIn, users[id].hashPass)) {
     return res.status(403).send("Invalid credentials");
   }
