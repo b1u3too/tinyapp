@@ -190,7 +190,7 @@ app.post("/login", (req, res) => {
   if (!id) {
     return res.status(403).send("Invalid credentials");
   }
-  if (bcrypt.compareSync(users[id].hashPass, passwordIn)) {
+  if (!bcrypt.compareSync(passwordIn, users[id].hashPass)) {
     return res.status(403).send("Invalid credentials");
   }
 
